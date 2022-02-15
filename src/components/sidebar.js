@@ -129,6 +129,9 @@ const Sidebar = () => {
       <Text>
         Sidebar. TODO: Add search/filter and list.
       </Text>
+      <Text>
+        Data borrowed from https://bmap.app/ for demo purposes.
+      </Text>
     </Box>
   )
 };

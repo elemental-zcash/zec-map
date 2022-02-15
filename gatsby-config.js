@@ -4,7 +4,7 @@ module.exports = {
     description: `Map directory of merchants that accept Zcash.`,
     author: `@1337bytes`,
   },
-  pathPrefix: `/`,
+  pathPrefix: `/zec-map`,
   plugins: [
     `gatsby-plugin-react-helmet`,
     {

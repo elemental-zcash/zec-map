@@ -9,6 +9,23 @@ exports.onCreateWebpackConfig = ({
   actions,
 }) => {
   actions.setWebpackConfig({
+    ...(stage === 'build-html' && {
+      module: {
+        ...getConfig().module,
+        rules: [
+          ...getConfig().module.rules,
+          {
+            test: /mapbox-gl/,
+            use: loaders.null(),
+          },
+          {
+            test: /react-map-gl/,
+            use: loaders.null(),
+          },
+        ],
+      },
+    }),
+    
     plugins: [
       ...getConfig().plugins,
       new webpack.ProvidePlugin({

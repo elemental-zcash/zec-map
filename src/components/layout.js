@@ -13,7 +13,7 @@ import { MDXProvider } from '@mdx-js/react';
 import { Box, Row, Text } from 'elemental-react';
 import { Section } from '@elemental-zcash/style-guide';
 
-import Header from './header';
+import Header, { HEADER_HEIGHT } from './header';
 import Sidebar from './sidebar';
 import components from '../i18n/components';
 
@@ -46,6 +46,7 @@ const Layout = ({ children, pageContext }) => {
           </Box>
           <Box
             width="100%"
+            height={`calc(100vh - ${HEADER_HEIGHT}px)`}
             // p={['16px', '40px']}
             justifyContent="center"
             flexDirection="row-reverse"

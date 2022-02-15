@@ -1,6 +1,6 @@
 [{
-  "CREDIT": "https://github.com/theRealBitcoinClub/bmap.app",
-  "CREDIT_2": "https://bmap.app"
+  "CREDIT_SOURCE": "https://github.com/theRealBitcoinClub/bmap.app/blob/main/firebase/public/bitcoinmap/A5_places8.json",
+  "CREDIT_SOURCE_SITE": "https://bmap.app"
 }, {"p":"lalima","x":"41.4059946","y":"2.1567663","n":"La Lima, comedor vegano","t":"0","c":"11","s":"5.0","d":"0","a":"3,5,6,11","l":"Carrer de lAlzina, Barcelona, Spain"}
   ,{"p":"pasticceria","x":"41.4047427","y":"2.1559692","n":"La Pasticceria di Gracia","t":"1","c":"93","s":"4.5","d":"0","a":"9,10,12,11","l":"Carrer de Verdi, Barcelona, Spain"}
   ,{"p":"lavermu","x":"41.4000891","y":"2.1568007","n":"La Vermu - Bar and Tapas","t":"2","c":"473","s":"4.2","d":"0","a":"31,32,33,36","l":"Carrer de Sant Domènec, Barcelona, Spain"}

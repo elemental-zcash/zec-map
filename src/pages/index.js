@@ -2,15 +2,19 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'gatsby';
 import { Box, Row, Text, useWindowDimensions } from 'elemental-react';
 
-import MapGL, { Popup, Marker } from 'react-map-gl';
+import loadable from '@loadable/component';
 import useSwr from 'swr';
 import useSupercluster from 'use-supercluster';
 
-import { QRCode } from '@elemental-zcash/components';
+import { Svg, Path } from 'react-primitives-svg';
+
+// import { QRCode } from '@elemental-zcash/components';
+
+import FilledCard from '@elemental-zcash/components/lib/cards/FilledCard';
+
+import mapboxgl from 'mapbox-gl';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
-
-import DefaultButton from '@elemental-zcash/components/lib/buttons/DefaultButton';
 
 import Layout from '../components/layout';
 import SEO from '../components/seo';
@@ -20,6 +24,43 @@ import { Markers } from '../map/marker';
 import { HEADER_HEIGHT } from '../components/header';
 
 import _places from '../map/places-tmp.json';
+
+// const { MapGL, Popup, Marker } = loadable(async () => {
+//   // const { default: MapGL, Popup, Marker } = await import('react-map-gl');
+//   let MapGL, Popup, Marker = null;
+
+//   return { MapGL, Popup, Marker };
+// });
+
+const MapGL = loadable(() => import('react-map-gl'), {
+  resolveComponent: (components) => components.default,
+});
+const Popup = loadable(() => import('react-map-gl'), {
+  resolveComponent: (components) => components.Popup,
+});
+const Marker = loadable(() => import('react-map-gl'), {
+  resolveComponent: (components) => components.Marker,
+});
+// const mapboxgl = loadable(() => import('mapbox-gl'));
+// const { Popup, Marker } = MapGL;
+
+if (mapboxgl && typeof window !== 'undefined') {
+  mapboxgl.workerClass =
+    require("worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker").default
+}
+
+const ListIcon = ({ size = 24, fill = '#000' }) => (
+  <Svg xmlns="http://www.w3.org/2000/svg" height={size} viewBox="0 0 24 24" width={size}>
+    <Path d="M0 0h24v24H0z" fill="none" />
+    <Path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" fill={fill} />
+  </Svg>
+);
+const MapIcon = ({ size = 24, fill = '#000' }) => (
+  <Svg xmlns="http://www.w3.org/2000/svg" height={size} viewBox="0 0 24 24" width={size}>
+    <Path d="M0 0h24v24H0z" fill="none" />
+    <Path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z" fill={fill} />
+  </Svg>
+);
 
 const tToType = {
   0: 'restaurant',
@@ -220,6 +261,21 @@ const places = _places.filter(({ p }) => p).map(({ p, t, x, y, n, a }) => {
   const lng = y;
   const name = n;
   const tags = a.split(",").map(n => tagNames[n]);
+  const accepts = tags.map((tag) => {
+    switch (tag) {
+      case 'DASH Ð': { return 'DASH' }
+      case 'BTC ₿': { return 'BTC' }
+      case 'BCH ₿': { return 'BCH' }
+      case 'GOCRYPTO ₿': { return 'GOCRYPTO' }
+      case 'DASHText Ð': { return 'DASHText' }
+      case 'CoinTigo ₿': { return 'CoinTigo' }
+      case 'CoinText ₿': { return 'CoinText' }
+      case 'Salamantex ₿': { return 'Salamantex' }
+      case 'CryptoBuyer ₿': { return 'CryptoBuyer' }
+      case 'XPay ₿': { return 'XPay' }
+    }
+    return null;
+  }).filter(i => i);
 
 
   return {
@@ -231,6 +287,7 @@ const places = _places.filter(({ p }) => p).map(({ p, t, x, y, n, a }) => {
       latitude: lat,
       longitude: lng,
     },
+    accepts,
   };
 })
 
@@ -310,8 +367,10 @@ const Map = React.forwardRef(({ viewport, zoom = 9, ...props }, ref) => {
 
 const Home = () => {
   // const viewport = useWindowViewport();
+  const [pageViewType, setPageViewType] = useState('map');
   const { width, height } = useWindowDimensions();
   const [navOverlayOpen, setNavOverlayOpen] = useState(false);
+  const [placesInView, setPlacesInView] = useState();
   const mapRef = useRef();
   // const [zoom, setZoom] = useState(12);
   const [viewport, setViewport] = useState({
@@ -339,6 +398,7 @@ const Home = () => {
       name: place.name,
       tags: place.tags,
       category: place.type,
+      accepts: place.accepts,
     },
     geometry: {
       type: "Point",
@@ -348,6 +408,8 @@ const Home = () => {
       ]
     }
   }));
+
+  
 
   // useEffect(() => {
   //   if (mapRef.current && viewport) {
@@ -375,6 +437,19 @@ const Home = () => {
     options: { radius: 75, maxZoom: 20 }
   });
 
+  useEffect(() => {
+    const newPlaceList = [];
+
+    clusters.forEach((cluster) => {
+      const [longitude, latitude] = cluster.geometry.coordinates;
+
+      if (!cluster.isCluster) {
+        newPlaceList.push({ longitude, latitude, ...cluster.properties })
+      }
+    });
+    setPlacesInView(newPlaceList);
+  }, [clusters])
+
 
   useEffect(async () => {
     if (mapRef.current) {
@@ -391,172 +466,235 @@ const Home = () => {
       <SEO title="Home | Elemental Zcash Design System" />
       {/* <Box width="100vw"> */}
       <Box bg="white" width="100%" minHeight={`calc(100vh - ${HEADER_HEIGHT})`} flex={1}>
-        <Box alignItems="center" justifyContent="center" flex={1}>
+        <Box position="relative" alignItems="center" justifyContent="center" flex={1}>
           {/* <Text fontSize="h4" mb={4}>Welcome to{'\n'}Elemental Zcash!</Text>
           <Link to="/react/getting-started">
             <DefaultButton style={{ cursor: 'pointer' }}>
               Get started
             </DefaultButton>
           </Link> */}
-          <Map
-            ref={mapRef}
-            // position="sticky"
-            style={{ flex: 1, width: '100%', height: height - HEADER_HEIGHT }}
-            // height={}
-            // minHeight={512}
-            // width="100%"
-            // zoom={viewport.zoom}
-            viewport={viewport}
-            onMove={(event) => {
-              setViewport({ ...event.viewState });
-
-              if (mapRef.current) {
-                setBounds(mapRef.current.getMap().getBounds().toArray().flat());
-              }
-            }}
-          >
-            {/* <Markers markers={[[-0.15667150962827356,51.50642925407983]]} /> */}
-            {/* {markers.map((marker, index) => (
-              <Marker
-                key={`marker-${index}`}
-                longitude={marker.longitude}
-                latitude={marker.latitude}
-                anchor="bottom"
-              >
-                <Pin onClick={() => setPopupInfo(marker)} />
-              </Marker>
-            ))} */}
-            {clusters.map((cluster) => {
-              // every cluster point has coordinates
-              const [longitude, latitude] = cluster.geometry.coordinates;
-              // the point may be either a cluster or a crime point
-              const {
-                cluster: isCluster,
-                point_count: pointCount
-              } = cluster.properties;
-
-              // we have a cluster to render
-              if (isCluster) {
-                return (
-                  <Marker
-                    key={`cluster-${cluster.id}`}
-                    latitude={latitude}
-                    longitude={longitude}
-                  >
-                    <Box
-                      className="cluster-marker"
-                      bg="#1978c8"
-                      borderRadius="50%"
-                      p="16px"
-                      alignItems="center"
-                      justifyContent="center"
-                      color="white"
-                      style={{
-                        width: `${10 + (pointCount / points.length) * 20}px`,
-                        height: `${10 + (pointCount / points.length) * 20}px`,
-                        cursor: 'pointer',
-                      }}
-                      onClick={() => {
-                        const expansionZoom = Math.min(
-                          supercluster.getClusterExpansionZoom(cluster.id),
-                          20
-                        );
-                  
-                        mapRef.current.flyTo({
-                          center: [
-                            longitude,
-                            latitude,
-                          ],
-                          zoom: expansionZoom,
-                          essential: true // this animation is considered essential with respect to prefers-reduced-motion
-                          });
-                        // setViewport({
-                        //   ...viewport,
-                        //   latitude,
-                        //   longitude,
-                        //   zoom: expansionZoom,
-                        //   transitionInterpolator: new FlyToInterpolator({
-                        //     speed: 2
-                        //   }),
-                        //   transitionDuration: "auto"
-                        // });
-                      }}
-                    >
-                      {pointCount}
-                    </Box>
-                  </Marker>
-                );
-              }
-
-              // we have a single point (crime) to render
-              return (
-                // <Marker
-                //   key={`crime-${cluster.properties.crimeId}`}
-                //   latitude={latitude}
-                //   longitude={longitude}
-                // >
-                //   <button className="crime-marker">
-                //     <img src="/custody.svg" alt="crime doesn't pay" />
-                //   </button>
-                // </Marker>
-                <Marker
-                  key={`place-${cluster.properties.placeId}`}
-                  longitude={longitude}
-                  latitude={latitude}
-                  anchor="bottom"
-                >
-                  <Pin onClick={() => setPopupInfo({ longitude, latitude, ...cluster.properties })} />
-                </Marker>
-              );
-            })}
-            {popupInfo ? (
-              <Popup
-                anchor="top"
-                longitude={Number(popupInfo.longitude)}
-                latitude={Number(popupInfo.latitude)}
-                closeOnClick={false}
-                onClose={() => setPopupInfo(null)}
-              >
-                <Box p={24}>
-                  <Text mb={2}>
-                    {popupInfo?.name}
-                  </Text>
-                  <Text mb={2}>
-                    {popupInfo?.category}
-                  </Text>
+          <Box display={['flex', 'flex', 'none']} zIndex={10} position="absolute" bottom={64} right={64}>
+            <Row
+              as="a"
+              style={{ cursor: 'pointer' }}
+              onPress={() => {
+                if (pageViewType === 'map') {
+                  setPageViewType('list');
+                } else {
+                   setPageViewType('map');
+                 }
+              }}
+              alignItems="center"
+              height={64}
+              bg="greys.9"
+              borderRadius="8px"
+              p="16px"
+            >
+              {pageViewType === 'map' && (
+                <>
+                  <Box size={24} mr={2}>
+                    <ListIcon fill="white" />
+                  </Box>
+                  <Text color="white">View list</Text>
+                </>
+              )}
+              {pageViewType === 'list' && (
+                <>
+                  <Box size={24} mr={2}>
+                    <MapIcon fill="white" />
+                  </Box>
+                  <Text color="white">View map</Text>
+                </>
+              )}
+            </Row>
+          </Box>
+          {pageViewType === 'list' && (
+            <Box>
+              <Text mb={3}>
+                Data borrowed from https://bmap.app/ for demo purposes.
+              </Text>
+              {placesInView?.map((place) => (
+                <FilledCard bg="greys.2" p={20} mb={4}>
+                  <Text fontSize={20} mb={3}>{place.name}</Text>
+                  <Text mb={2}>{place.category}</Text>
                   <Row>
-                    {popupInfo?.tags?.map((tag) => (
-                      <Text mr={2}>
+                    {place.tags?.map((tag) => (
+                      <Text mr={2} mb={2}>
                         {tag.match(/[\p{Emoji}\u200d]+/gu)}
                       </Text>
                     ))}
                   </Row>
-                  {/* <Text color="primary" mb={3}>
-                    Pay 0.1 ZEC to
-                  </Text>
-                  <Box alignItems="center">
-                    {[
-                      { bg: 'white', linearGradient: ['#00F9F9', '#0054FF'], borderColor: 'black', borderWidth: '4px' },
-                    ].map(({ bg, stroke, borderColor, borderWidth, linearGradient, svgLogo }) => (
-                      <QRCode
-                        backgroundColor={false}
-                        enableLinearGradient={Boolean(linearGradient)}
-                        linearGradient={linearGradient}
-                        color={stroke}
-                        includeMargin={true}
-                        size={tileWidth}
-                        value={`zcash:${0}?amount=0.001&memo=${0}`}
-                        logoBackgroundColor="white"
-                        logoBorderRadius={50}
-                        svgLogo={svgLogo}
-                        svgLogoSize={48}
-                      />
-                    </Box>
-                    ))} */}
-                </Box>
-              </Popup>
-              ) : null}
-          </Map>
+                  {place.accepts?.length > 0 && (
+                    <Text>Accepts: {place.accepts.join(', ')}</Text>
+                  )}
+                </FilledCard>
+              ))}
+            </Box>
+          )}
+          {pageViewType === 'map' && (
+            <Map
+              ref={mapRef}
+              // position="sticky"
+              style={{ flex: 1, width: '100%', height: height - HEADER_HEIGHT }}
+              // height={}
+              // minHeight={512}
+              // width="100%"
+              // zoom={viewport.zoom}
+              viewport={viewport}
+              onMove={(event) => {
+                setViewport({ ...event.viewState });
+
+                if (mapRef.current) {
+                  setBounds(mapRef.current.getMap().getBounds().toArray().flat());
+                }
+              }}
+            >
+              {/* <Markers markers={[[-0.15667150962827356,51.50642925407983]]} /> */}
+              {/* {markers.map((marker, index) => (
+                <Marker
+                  key={`marker-${index}`}
+                  longitude={marker.longitude}
+                  latitude={marker.latitude}
+                  anchor="bottom"
+                >
+                  <Pin onClick={() => setPopupInfo(marker)} />
+                </Marker>
+              ))} */}
+              {clusters.map((cluster) => {
+                // every cluster point has coordinates
+                const [longitude, latitude] = cluster.geometry.coordinates;
+                // the point may be either a cluster or a crime point
+                const {
+                  cluster: isCluster,
+                  point_count: pointCount
+                } = cluster.properties;
+
+                // we have a cluster to render
+                if (isCluster) {
+                  return (
+                    <Marker
+                      key={`cluster-${cluster.id}`}
+                      latitude={latitude}
+                      longitude={longitude}
+                    >
+                      <Box
+                        className="cluster-marker"
+                        bg="#1978c8"
+                        borderRadius="50%"
+                        p="16px"
+                        alignItems="center"
+                        justifyContent="center"
+                        color="white"
+                        style={{
+                          width: `${10 + (pointCount / points.length) * 20}px`,
+                          height: `${10 + (pointCount / points.length) * 20}px`,
+                          cursor: 'pointer',
+                        }}
+                        onClick={() => {
+                          const expansionZoom = Math.min(
+                            supercluster.getClusterExpansionZoom(cluster.id),
+                            20
+                          );
+                    
+                          mapRef.current.flyTo({
+                            center: [
+                              longitude,
+                              latitude,
+                            ],
+                            zoom: expansionZoom,
+                            essential: true // this animation is considered essential with respect to prefers-reduced-motion
+                            });
+                          // setViewport({
+                          //   ...viewport,
+                          //   latitude,
+                          //   longitude,
+                          //   zoom: expansionZoom,
+                          //   transitionInterpolator: new FlyToInterpolator({
+                          //     speed: 2
+                          //   }),
+                          //   transitionDuration: "auto"
+                          // });
+                        }}
+                      >
+                        {pointCount}
+                      </Box>
+                    </Marker>
+                  );
+                }
+
+                // we have a single point (crime) to render
+                return (
+                  // <Marker
+                  //   key={`crime-${cluster.properties.crimeId}`}
+                  //   latitude={latitude}
+                  //   longitude={longitude}
+                  // >
+                  //   <button className="crime-marker">
+                  //     <img src="/custody.svg" alt="crime doesn't pay" />
+                  //   </button>
+                  // </Marker>
+                  <Marker
+                    key={`place-${cluster.properties.placeId}`}
+                    longitude={longitude}
+                    latitude={latitude}
+                    anchor="bottom"
+                  >
+                    <Pin onClick={() => setPopupInfo({ longitude, latitude, ...cluster.properties })} />
+                  </Marker>
+                );
+              })}
+              {popupInfo ? (
+                <Popup
+                  anchor="top"
+                  longitude={Number(popupInfo.longitude)}
+                  latitude={Number(popupInfo.latitude)}
+                  closeOnClick={false}
+                  onClose={() => setPopupInfo(null)}
+                >
+                  <Box p={24}>
+                    <Text mb={2}>
+                      {popupInfo?.name}
+                    </Text>
+                    <Text mb={2}>
+                      {popupInfo?.category}
+                    </Text>
+                    <Row>
+                      {popupInfo?.tags?.map((tag) => (
+                        <Text mr={2}>
+                          {tag.match(/[\p{Emoji}\u200d]+/gu)}
+                        </Text>
+                      ))}
+                    </Row>
+                    {popupInfo?.accepts?.length > 0 && (
+                      <Text>Accepts: {popupInfo.accepts.join(', ')}</Text>
+                    )}
+                    {/* <Text color="primary" mb={3}>
+                      Pay 0.1 ZEC to
+                    </Text>
+                    <Box alignItems="center">
+                      {[
+                        { bg: 'white', linearGradient: ['#00F9F9', '#0054FF'], borderColor: 'black', borderWidth: '4px' },
+                      ].map(({ bg, stroke, borderColor, borderWidth, linearGradient, svgLogo }) => (
+                        <QRCode
+                          backgroundColor={false}
+                          enableLinearGradient={Boolean(linearGradient)}
+                          linearGradient={linearGradient}
+                          color={stroke}
+                          includeMargin={true}
+                          size={tileWidth}
+                          value={`zcash:${0}?amount=0.001&memo=${0}`}
+                          logoBackgroundColor="white"
+                          logoBorderRadius={50}
+                          svgLogo={svgLogo}
+                          svgLogoSize={48}
+                        />
+                      </Box>
+                      ))} */}
+                  </Box>
+                </Popup>
+                ) : null}
+            </Map>
+          )}
         </Box>
       </Box>
       {/* </Box> */}

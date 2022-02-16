@@ -20,7 +20,7 @@ import components from '../i18n/components';
 import './layout.css';
 
 
-const Layout = ({ children, pageContext }) => {
+const Layout = ({ placeItems, children, pageContext }) => {
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
       site {
@@ -42,7 +42,7 @@ const Layout = ({ children, pageContext }) => {
         <Header siteTitle={data.site.siteMetadata.title} />
         <Row>
           <Box display={['none', null, null, 'block']}>
-            <Sidebar />
+            <Sidebar placeItems={placeItems} />
           </Box>
           <Box
             width="100%"

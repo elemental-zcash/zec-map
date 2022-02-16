@@ -1,7 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Box, Text } from 'elemental-react';
+import { Box, Text, Row } from 'elemental-react';
 import { Link as GatsbyLink } from 'gatsby';
+import { Formik } from 'formik';
+
+import InputField from '@elemental-zcash/components/lib/forms/InputField';
+import TextInput from '@elemental-zcash/components/lib/forms/TextInput';
+import FilledCard from '@elemental-zcash/components/lib/cards/FilledCard';
+
 
 import { HEADER_HEIGHT } from './header';
 
@@ -121,15 +127,64 @@ const SidebarNavItems = ({ items }) => {
   )
 }
 
-const Sidebar = () => {
+const Sidebar = ({ placeItems }) => {
 
   return (
     <Box position="sticky" minWidth={260} top={HEADER_HEIGHT} height={`calc(100vh - ${HEADER_HEIGHT}px)`} bg="greys.1">
-      <SidebarNavItems items={[]} />
-      <Text>
+      {/* <SidebarNavItems items={[]} /> */}
+
+      
+
+      <Formik
+        initialValues={{ search: '' }}
+        onSubmit={values => console.log(values)}
+      >
+        {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => (
+          <Box p={3}>
+            {/* <TextInput
+              onChangeText={handleChange('email')}
+              onBlur={handleBlur('email')}
+              value={values.email}
+            /> */}
+            <InputField label="Search ZEC Map" value={values.search} mb={2}>
+              {({ label, value }) => (
+                <TextInput
+                  label={label}
+                  value={value}
+                  onChange={({ target: { value: textValue }}) => {
+                    console.log({ textValue });
+                    setFieldValue('search', textValue);
+                  }}
+                />
+              )}
+            </InputField>
+            {/* <Button onPress={handleSubmit} title="Submit" /> */}
+          </Box>
+        )}
+      </Formik>
+
+      <Box height={100} />
+
+      {placeItems?.map((place) => (
+        <FilledCard bg="greys.2" p={20} mb={4}>
+          <Text fontSize={20} mb={3}>{place.name}</Text>
+          <Text mb={2}>{place.category}</Text>
+          <Row>
+            {place.tags?.map((tag) => (
+              <Text mr={2} mb={2}>
+                {tag.match(/[\p{Emoji}\u200d]+/gu)}
+              </Text>
+            ))}
+          </Row>
+          {place.accepts?.length > 0 && (
+            <Text>Accepts: {place.accepts.join(', ')}</Text>
+          )}
+        </FilledCard>
+      ))}
+      {/* <Text>
         Sidebar. TODO: Add search/filter and list.
-      </Text>
-      <Text>
+      </Text> */}
+      <Text mt={40}>
         Data borrowed from https://bmap.app/ for demo purposes.
       </Text>
     </Box>

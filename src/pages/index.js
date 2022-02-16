@@ -6,7 +6,7 @@ import loadable from '@loadable/component';
 import useSwr from 'swr';
 import useSupercluster from 'use-supercluster';
 
-import { Svg, Path } from 'react-primitives-svg';
+import { Svg, Path, G, Rect } from 'react-primitives-svg';
 
 // import { QRCode } from '@elemental-zcash/components';
 
@@ -307,12 +307,78 @@ const pinStyle = {
   stroke: 'none'
 };
 
-function Pin({size = 20, onClick}) {
-  return (
-    <svg height={size} viewBox="0 0 24 24" style={pinStyle} onClick={onClick}>
-      <path d={ICON} />
-    </svg>
-  );
+// function Pin({size = 20, onClick}) {
+//   return (
+//     <svg height={size} viewBox="0 0 24 24" style={pinStyle} onClick={onClick}>
+//       <path d={ICON} />
+//     </svg>
+//   );
+// }
+
+const MarkerIcon = ({ size = 24, fill = '#000' }) => (
+  <Svg xmlns="http://www.w3.org/2000/svg" height={size} viewBox="0 0 24 24" width={size}>
+    <Path d="M0 0h24v24H0z" fill="none" />
+    <Path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill={fill} />
+  </Svg>
+);
+
+const CupIcon = ({ size = 24, fill = '#000' }) => (
+  <Svg xmlns="http://www.w3.org/2000/svg" height={size} viewBox="0 0 24 24" width={size}>
+    <Path d="M0 0h24v24H0V0z" fill="none" />
+    <Path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.9 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z" fill={fill} />
+  </Svg>
+);
+
+const RestaurantIcon = ({ size = 24, fill = '#000' }) => (
+  <Svg xmlns="http://www.w3.org/2000/svg" height={size} viewBox="0 0 24 24" width={size}>
+    <Path d="M0 0h24v24H0z" fill="none" />
+    <Path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z" fill={fill} />
+  </Svg>
+);
+const BarIcon = ({ size = 24, fill = '#000' }) => (
+  <Svg xmlns="http://www.w3.org/2000/svg" height={size} viewBox="0 0 24 24" width={size}>
+    <Path d="M0 0h24v24H0z" fill="none"/>
+    <Path d="M21 5V3H3v2l8 9v5H6v2h12v-2h-5v-5l8-9zM7.43 7L5.66 5h12.69l-1.78 2H7.43z" fill={fill} />
+  </Svg>
+);
+const SuperIcon = ({ size = 24, fill = '#000' }) => (
+  <Svg xmlns="http://www.w3.org/2000/svg" height={size} viewBox="0 0 24 24" width={size}>
+    <Path d="M0 0h24v24H0z" fill="none" />
+    <Path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" fill={fill} />
+  </Svg>
+);
+const ShopIcon = ({ size = 24, fill = '#000' }) => (
+  <Svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height={size} viewBox="0 0 24 24" width={size}>
+    <G>
+      <Rect fill="none" height="24" width="24" />
+      <Path d="M18,6h-2c0-2.21-1.79-4-4-4S8,3.79,8,6H6C4.9,6,4,6.9,4,8v12c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2V8C20,6.9,19.1,6,18,6z M10,10c0,0.55-0.45,1-1,1s-1-0.45-1-1V8h2V10z M12,4c1.1,0,2,0.9,2,2h-4C10,4.9,10.9,4,12,4z M16,10c0,0.55-0.45,1-1,1 s-1-0.45-1-1V8h2V10z" fill={fill} />
+    </G>
+  </Svg>
+);
+
+const HotelIcon = ({ size = 24, fill = '#000' }) => (
+  <Svg xmlns="http://www.w3.org/2000/svg" height={size} viewBox="0 0 24 24" width={size}>
+    <Path d="M0 0h24v24H0z" fill="none" />
+    <Path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z" fill={fill} />
+  </Svg>
+);
+
+// 'restaurant',
+// 'food',
+// 'bar',
+// 'super',
+// 'shop',
+// 'hotel',
+// 'atm',
+// 'spa',
+// 'tattoo',
+const categoryIconMap = {
+  food: { icon: CupIcon },
+  restaurant: { icon: RestaurantIcon },
+  bar: { icon: BarIcon },
+  super: { icon: SuperIcon },
+  shop: { icon: ShopIcon },
+  hotel: { icon: HotelIcon },
 }
 
 // const StyledMap = props => (
@@ -425,25 +491,23 @@ const Home = () => {
   //     setZoom(map.current.getZoom().toFixed(2));
   //   });
 
-  if (bounds) {
-    // debugger;
-    console.log({ bounds });
-  }
-
   const { clusters, supercluster } = useSupercluster({
     points,
     bounds,
     zoom: viewport.zoom,
-    options: { radius: 75, maxZoom: 20 }
+    options: {
+      radius: 75,
+      maxZoom: 20,
+    },
   });
 
   useEffect(() => {
     const newPlaceList = [];
 
     clusters.forEach((cluster) => {
-      const [longitude, latitude] = cluster.geometry.coordinates;
+      const [longitude, latitude] = cluster?.geometry?.coordinates;
 
-      if (!cluster.isCluster) {
+      if (!cluster?.cluster && !cluster?.properties?.cluster) {
         newPlaceList.push({ longitude, latitude, ...cluster.properties })
       }
     });
@@ -451,18 +515,12 @@ const Home = () => {
   }, [clusters])
 
 
-  useEffect(async () => {
-    if (mapRef.current) {
-      setBounds(mapRef.current.getMap().getBounds().toArray().flat());
-    }
-  }, [mapRef.current]);
-
   const [markers, setMarkers] = useState([{ longitude: -0.15667150962827356, latitude: 51.50642925407983 } ]);
 
   const tileWidth = 64;
 
   return (
-    <Layout>
+    <Layout placeItems={placesInView}>
       <SEO title="Home | Elemental Zcash Design System" />
       {/* <Box width="100vw"> */}
       <Box bg="white" width="100%" minHeight={`calc(100vh - ${HEADER_HEIGHT})`} flex={1}>
@@ -541,6 +599,11 @@ const Home = () => {
               // width="100%"
               // zoom={viewport.zoom}
               viewport={viewport}
+              onLoad={() => {
+                if (mapRef.current) {
+                  setBounds(mapRef.current.getMap().getBounds().toArray().flat());
+                }
+              }}
               onMove={(event) => {
                 setViewport({ ...event.viewState });
 
@@ -581,13 +644,13 @@ const Home = () => {
                         className="cluster-marker"
                         bg="#1978c8"
                         borderRadius="50%"
-                        p="16px"
+                        p={16 + ((pointCount / points.length) * 40)}
                         alignItems="center"
                         justifyContent="center"
                         color="white"
                         style={{
-                          width: `${10 + (pointCount / points.length) * 20}px`,
-                          height: `${10 + (pointCount / points.length) * 20}px`,
+                          width: 10,
+                          height: 10,
                           cursor: 'pointer',
                         }}
                         onClick={() => {
@@ -604,23 +667,17 @@ const Home = () => {
                             zoom: expansionZoom,
                             essential: true // this animation is considered essential with respect to prefers-reduced-motion
                             });
-                          // setViewport({
-                          //   ...viewport,
-                          //   latitude,
-                          //   longitude,
-                          //   zoom: expansionZoom,
-                          //   transitionInterpolator: new FlyToInterpolator({
-                          //     speed: 2
-                          //   }),
-                          //   transitionDuration: "auto"
-                          // });
                         }}
                       >
-                        {pointCount}
+                        <Text fontSize={14} color="white">
+                          {pointCount}
+                        </Text>
                       </Box>
                     </Marker>
                   );
                 }
+
+                const CategoryIconMarker = categoryIconMap[cluster.properties.category]?.icon || 'div';
 
                 // we have a single point (crime) to render
                 return (
@@ -639,7 +696,23 @@ const Home = () => {
                     latitude={latitude}
                     anchor="bottom"
                   >
-                    <Pin onClick={() => setPopupInfo({ longitude, latitude, ...cluster.properties })} />
+                    <Box
+                      position="relative"
+                      onClick={() => setPopupInfo({ longitude, latitude, ...cluster.properties })}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <MarkerIcon size={32} fill="#202124" />
+                      <Box
+                        position="absolute"
+                        width="100%"
+                        height="100%"
+                        pb="4px"
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <CategoryIconMarker fill="white" size={12} />
+                      </Box>
+                    </Box>
                   </Marker>
                 );
               })}

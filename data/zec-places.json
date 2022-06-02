@@ -1,0 +1,87 @@
+{
+  "items": [
+    {
+      "name": "Stats Auto Spa",
+      "website": "https://stats-auto-spa.com/",
+      "plus_code": "VGH8+6G Sevierville, Tennessee, USA",
+      "formatted_address": "1966 Walnut Grove Rd, Sevierville TN 37876, United States",
+      "accepted": {
+        "source": {
+          "url": "https://stats-auto-spa.com/shop/",
+          "text": "Paying with Crypto-Currency please call or text me when ready to buy"
+        },
+        "coins": [""]
+      },
+      "location": {
+        "lat": 35.878062,
+        "lng": -83.483688
+      }
+    },
+    {
+      "name": "Apex Business Partners",
+      "website": "https://www.apexbusinesspartners.com/",
+      "formatted_address": "100 Warren Street, Suite 345, Mankato MN 56001, United States",
+      "accepted": {
+        "source": {
+          "url": "https://apexbusinesspartners.com/crypto",
+          "text": "Bitcoin, Ethereum and Zcash accepted here"
+        },
+        "coins": ["BTC", "ETH", "ZEC"]
+      }
+    },
+    {
+      "name": "Atlanta Dental"
+      "formatted_address": "2166 Lavista Rd NE, Atlanta GA 30329, United States",
+      "website": "https://www.atlantadentalarts.com/",
+      "accepted": {
+        "source": {
+          "url": "https://www.atlantadentalarts.com/cryptocurrencies-accepted",
+          "text": [
+            "In an effort to stay on the cutting edge of technology, we now accept Bitcoin, Ethereum, Dash and Zcash.",
+            "If you have another coin you would like to use, please submit for consideration."
+          ]
+        },
+        "coins": ["BTC", "DASH", "ETH", "ZEC"]
+      },
+      "plus_code": "RM9P+43 Atlanta, Georgia, USA",
+      "location": {
+        "lat": 33.81788202649955,
+        "lng": -84.3147840688545
+      }
+    },
+    {
+      "name": "Dunkin Donuts (Flexa/SPEDN app)"
+      "formatted_address": "3528 Washington Rd, McMurray PA 15317, United States",
+      "website": "",
+      "accepted": {
+        "source": {
+          "url": "https://twitter.com/LeviTheGiant/status/1528087264114401282",
+          "text": "Flexa/SPEDN"
+        },
+        "coins": ["FXC"]
+      },
+      "plus_code": "7VMH+H9 McMurray, Pennsylvania, USA",
+      "location": {
+        "lat": 40.28396062963146,
+        "lng": -80.1215413107046
+      }
+    },
+    {
+      "name": "Red Rock Coffeehouse"
+      "formatted_address": "3325 28th St, Boulder CO, United States",
+      "website": "https://www.redrockcoffeehouse.com/",
+      "accepted": {
+        "source": {
+          "url": "https://twitter.com/jswihart/status/1393224199137685506?s=20",
+          "text": "Buying my morning coffee with Zcash $ZEC!"
+        },
+        "coins": ["ZEC"]
+      },
+      "plus_code": "2PPQ+8Q Boulder, Colorado, USA",
+      "location": {
+        "lat": 40.03582865996003,
+        "lng": -105.26052993142359
+      }
+    }
+  ]
+}
